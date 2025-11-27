@@ -105,7 +105,7 @@ const SudokuGenerator = {
         
         // Determine how many cells to remove based on difficulty
         const clueRanges = {
-            easy: { min: 45, max: 50 },
+            easy: { min: 50, max: 55 },
             medium: { min: 35, max: 44 },
             hard: { min: 27, max: 34 },
             superhard: { min: 17, max: 26 }
