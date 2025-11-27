@@ -155,7 +155,7 @@ body {
     box-shadow: var(--shadow);
 }
 
-.difficulty-display, .timer-display {
+.difficulty-display, .timer-display, .lives-display {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -531,6 +531,21 @@ body {
     font-weight: 600;
     color: var(--btn-active);
     margin: 16px 0;
+}
+
+/* Game Over modal */
+.game-over {
+    text-align: center;
+}
+
+.game-over h2 {
+    font-size: 1.75rem;
+    color: var(--cell-error);
+}
+
+.game-over p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
 }
 
 /* Responsive adjustments */

@@ -4,6 +4,9 @@
  */
 
 const SudokuGame = {
+    // Maximum number of lives
+    MAX_LIVES: 3,
+
     /**
      * Initialize the game
      */
@@ -18,7 +21,9 @@ const SudokuGame = {
             conflicts: [],        // Cells with conflicts
             highlightedNumber: 0, // Currently highlighted number
             difficulty: 'easy',   // Current difficulty
-            isComplete: false     // Whether puzzle is solved
+            isComplete: false,    // Whether puzzle is solved
+            lives: this.MAX_LIVES, // Number of lives remaining
+            isGameOver: false     // Whether game is over (ran out of lives)
         };
 
         this.selectedRow = -1;
@@ -41,9 +46,11 @@ const SudokuGame = {
         this.gridContainer = document.getElementById('sudoku-grid');
         this.difficultyDisplay = document.getElementById('current-difficulty');
         this.timerDisplay = document.getElementById('timer');
+        this.livesDisplay = document.getElementById('lives');
         this.difficultyModal = document.getElementById('difficulty-modal');
         this.winModal = document.getElementById('win-modal');
         this.winTimeDisplay = document.getElementById('win-time-display');
+        this.gameOverModal = document.getElementById('game-over-modal');
 
         // Initialize renderer
         SudokuRenderer.init(this.gridContainer);
@@ -123,6 +130,12 @@ const SudokuGame = {
             this.showDifficultyModal();
         });
 
+        // Game Over modal
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            this.hideGameOverModal();
+            this.showDifficultyModal();
+        });
+
         // Close modals when clicking outside
         this.difficultyModal.addEventListener('click', (e) => {
             if (e.target === this.difficultyModal) {
@@ -133,6 +146,12 @@ const SudokuGame = {
         this.winModal.addEventListener('click', (e) => {
             if (e.target === this.winModal) {
                 this.hideWinModal();
+            }
+        });
+
+        this.gameOverModal.addEventListener('click', (e) => {
+            if (e.target === this.gameOverModal) {
+                this.hideGameOverModal();
             }
         });
     },
@@ -167,6 +186,8 @@ const SudokuGame = {
         );
         this.state.conflicts = Array.from({ length: 9 }, () => Array(9).fill(false));
         this.state.isComplete = false;
+        this.state.lives = this.MAX_LIVES;
+        this.state.isGameOver = false;
 
         // Clear selection and history
         this.selectedRow = -1;
@@ -178,6 +199,9 @@ const SudokuGame = {
         // Reset and start timer
         SudokuTimer.reset();
         SudokuTimer.start();
+
+        // Update lives display
+        this.updateLivesDisplay();
 
         // Update completed numbers
         SudokuInput.updateCompletedNumbers(this.state);
@@ -231,6 +255,9 @@ const SudokuGame = {
      * @param {number} number - Number to input (0 to erase)
      */
     handleNumberInput(row, col, number) {
+        // Don't allow input if game is over
+        if (this.state.isGameOver) return;
+
         // Don't modify official cells
         if (this.state.official[row][col]) return;
 
@@ -248,6 +275,10 @@ const SudokuGame = {
             if (number === 0) {
                 this.state.userEntries[row][col] = 0;
             } else {
+                // Check if the number is wrong against the solution
+                if (number !== this.state.solution[row][col]) {
+                    this.loseLife(row, col);
+                }
                 this.state.userEntries[row][col] = number;
                 this.state.candidates[row][col].clear();
             }
@@ -551,6 +582,48 @@ const SudokuGame = {
      */
     hideWinModal() {
         this.winModal.classList.remove('active');
+    },
+
+    /**
+     * Show the game over modal
+     */
+    showGameOverModal() {
+        this.gameOverModal.classList.add('active');
+    },
+
+    /**
+     * Hide the game over modal
+     */
+    hideGameOverModal() {
+        this.gameOverModal.classList.remove('active');
+    },
+
+    /**
+     * Handle losing a life
+     * @param {number} row - Row index of wrong cell
+     * @param {number} col - Column index of wrong cell
+     */
+    loseLife(row, col) {
+        this.state.lives--;
+        this.updateLivesDisplay();
+        
+        // Flash the cell to indicate error
+        SudokuRenderer.flashCell(row, col, 'error');
+        
+        if (this.state.lives <= 0) {
+            this.state.isGameOver = true;
+            SudokuTimer.stop();
+            this.showGameOverModal();
+        }
+    },
+
+    /**
+     * Update the lives display
+     */
+    updateLivesDisplay() {
+        const hearts = '❤️'.repeat(this.state.lives);
+        const emptyHearts = '🖤'.repeat(this.MAX_LIVES - this.state.lives);
+        this.livesDisplay.textContent = hearts + emptyHearts;
     },
 
     /**
