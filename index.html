@@ -23,6 +23,10 @@
                 <span class="label">Difficulty:</span>
                 <span id="current-difficulty" class="value">Easy</span>
             </div>
+            <div class="lives-display">
+                <span class="label">Lives:</span>
+                <span id="lives" class="value">❤️❤️❤️</span>
+            </div>
             <div class="timer-display">
                 <span class="label">Time:</span>
                 <span id="timer" class="value">00:00</span>
@@ -112,6 +116,15 @@
                 <p>You solved the puzzle!</p>
                 <p class="win-time">Time: <span id="win-time-display">00:00</span></p>
                 <button id="play-again-btn" class="action-btn primary">Play Again</button>
+            </div>
+        </div>
+
+        <!-- Game Over modal -->
+        <div id="game-over-modal" class="modal">
+            <div class="modal-content game-over">
+                <h2>💔 Game Over 💔</h2>
+                <p>You ran out of lives!</p>
+                <button id="restart-btn" class="action-btn primary">Try Again</button>
             </div>
         </div>
     </div>
