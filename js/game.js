@@ -4,6 +4,9 @@
  */
 
 const SudokuGame = {
+    // Maximum number of lives
+    MAX_LIVES: 3,
+
     /**
      * Initialize the game
      */
@@ -19,7 +22,7 @@ const SudokuGame = {
             highlightedNumber: 0, // Currently highlighted number
             difficulty: 'easy',   // Current difficulty
             isComplete: false,    // Whether puzzle is solved
-            lives: 3,             // Number of lives remaining
+            lives: this.MAX_LIVES, // Number of lives remaining
             isGameOver: false     // Whether game is over (ran out of lives)
         };
 
@@ -183,7 +186,7 @@ const SudokuGame = {
         );
         this.state.conflicts = Array.from({ length: 9 }, () => Array(9).fill(false));
         this.state.isComplete = false;
-        this.state.lives = 3;
+        this.state.lives = this.MAX_LIVES;
         this.state.isGameOver = false;
 
         // Clear selection and history
@@ -619,7 +622,7 @@ const SudokuGame = {
      */
     updateLivesDisplay() {
         const hearts = '❤️'.repeat(this.state.lives);
-        const emptyHearts = '🖤'.repeat(3 - this.state.lives);
+        const emptyHearts = '🖤'.repeat(this.MAX_LIVES - this.state.lives);
         this.livesDisplay.textContent = hearts + emptyHearts;
     },
 
