@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app" class="container">
+        <!-- Header with title and controls -->
+        <header class="header">
+            <h1 class="title">Sudoku</h1>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                <span class="sun-icon">☀️</span>
+                <span class="moon-icon">🌙</span>
+            </button>
+        </header>
+
+        <!-- Game status bar -->
+        <div class="status-bar">
+            <div class="difficulty-display">
+                <span class="label">Difficulty:</span>
+                <span id="current-difficulty" class="value">Easy</span>
+            </div>
+            <div class="timer-display">
+                <span class="label">Time:</span>
+                <span id="timer" class="value">00:00</span>
+            </div>
+        </div>
+
+        <!-- Main Sudoku grid -->
+        <div id="sudoku-container" class="sudoku-container">
+            <div id="sudoku-grid" class="sudoku-grid"></div>
+        </div>
+
+        <!-- Number pad for input -->
+        <div class="number-pad">
+            <button class="num-btn" data-number="1">1</button>
+            <button class="num-btn" data-number="2">2</button>
+            <button class="num-btn" data-number="3">3</button>
+            <button class="num-btn" data-number="4">4</button>
+            <button class="num-btn" data-number="5">5</button>
+            <button class="num-btn" data-number="6">6</button>
+            <button class="num-btn" data-number="7">7</button>
+            <button class="num-btn" data-number="8">8</button>
+            <button class="num-btn" data-number="9">9</button>
+            <button class="num-btn erase-btn" data-number="0">⌫</button>
+        </div>
+
+        <!-- Mode controls -->
+        <div class="controls">
+            <div class="mode-controls">
+                <button id="candidate-toggle" class="control-btn">
+                    <span class="btn-icon">✏️</span>
+                    <span class="btn-text">Candidate Mode</span>
+                </button>
+                <button id="lock-candidate" class="control-btn" disabled>
+                    <span class="btn-icon">🔒</span>
+                    <span class="btn-text">Lock Candidate</span>
+                </button>
+            </div>
+            <div class="action-controls">
+                <button id="undo-btn" class="control-btn" disabled>
+                    <span class="btn-icon">↩️</span>
+                    <span class="btn-text">Undo</span>
+                </button>
+                <button id="redo-btn" class="control-btn" disabled>
+                    <span class="btn-icon">↪️</span>
+                    <span class="btn-text">Redo</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game actions -->
+        <div class="game-actions">
+            <button id="new-game-btn" class="action-btn primary">New Game</button>
+            <button id="solve-btn" class="action-btn secondary">Solve</button>
+            <button id="check-btn" class="action-btn secondary">Check</button>
+        </div>
+
+        <!-- Difficulty selection modal -->
+        <div id="difficulty-modal" class="modal">
+            <div class="modal-content">
+                <h2>Select Difficulty</h2>
+                <div class="difficulty-options">
+                    <button class="difficulty-btn" data-difficulty="easy">
+                        <span class="diff-title">Easy</span>
+                        <span class="diff-desc">45+ clues • Perfect for beginners</span>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="medium">
+                        <span class="diff-title">Medium</span>
+                        <span class="diff-desc">35-44 clues • Moderate challenge</span>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="hard">
+                        <span class="diff-title">Hard</span>
+                        <span class="diff-desc">27-34 clues • Requires advanced techniques</span>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="superhard">
+                        <span class="diff-title">Super Hard</span>
+                        <span class="diff-desc">17-26 clues • Expert only</span>
+                    </button>
+                </div>
+                <button id="close-modal" class="close-btn">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Win celebration modal -->
+        <div id="win-modal" class="modal">
+            <div class="modal-content celebration">
+                <h2>🎉 Congratulations! 🎉</h2>
+                <p>You solved the puzzle!</p>
+                <p class="win-time">Time: <span id="win-time-display">00:00</span></p>
+                <button id="play-again-btn" class="action-btn primary">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript modules -->
+    <script src="js/puzzles.js"></script>
+    <script src="js/generator.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/highlighting.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
