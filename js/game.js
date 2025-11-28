@@ -205,6 +205,7 @@ const SudokuGame = {
         document.getElementById('instant-check-toggle').addEventListener('change', (e) => {
             this.settings.instantCheckEnabled = e.target.checked;
             this.saveSettings();
+            this.render();
         });
     },
 
@@ -613,7 +614,7 @@ const SudokuGame = {
      * Render the current game state
      */
     render() {
-        SudokuRenderer.render(this.state);
+        SudokuRenderer.render(this.state, this.settings.instantCheckEnabled);
     },
 
     /**
