@@ -121,12 +121,14 @@ const SudokuGame = {
         });
         document.getElementById('solve-btn').addEventListener('click', () => {
             this.solvePuzzle();
+            this.hideDifficultyModal();
         });
         document.getElementById('clue-btn').addEventListener('click', () => {
             this.useClue();
         });
         document.getElementById('check-btn').addEventListener('click', () => {
             this.checkSolution();
+            this.hideDifficultyModal();
         });
 
         // Difficulty modal buttons
@@ -139,6 +141,12 @@ const SudokuGame = {
         });
 
         document.getElementById('close-modal').addEventListener('click', () => {
+            this.hideDifficultyModal();
+        });
+
+        // Restart current game button
+        document.getElementById('restart-current-btn').addEventListener('click', () => {
+            this.restartCurrentGame();
             this.hideDifficultyModal();
         });
 
@@ -247,6 +255,46 @@ const SudokuGame = {
         );
         this.state.official = puzzleData.puzzle.map(row => 
             row.map(cell => cell !== 0)
+        );
+        this.state.conflicts = Array.from({ length: 9 }, () => Array(9).fill(false));
+        this.state.isComplete = false;
+        this.state.lives = this.MAX_LIVES;
+        this.state.isGameOver = false;
+
+        // Clear selection and history
+        this.selectedRow = -1;
+        this.selectedCol = -1;
+        SudokuInput.clearSelection();
+        SudokuHistory.clear();
+        SudokuHighlighting.clearHighlights();
+
+        // Reset and start timer (only if timer is enabled)
+        SudokuTimer.reset();
+        if (this.settings.timerEnabled) {
+            SudokuTimer.start();
+        }
+
+        // Update lives display
+        this.updateLivesDisplay();
+
+        // Update completed numbers
+        SudokuInput.updateCompletedNumbers(this.state);
+
+        // Render the grid
+        this.render();
+    },
+
+    /**
+     * Restart the current game (clear user entries, keep same puzzle)
+     */
+    restartCurrentGame() {
+        // Don't restart if no game is in progress
+        if (this.state.puzzle.length === 0) return;
+
+        // Clear user entries and candidates
+        this.state.userEntries = Array.from({ length: 9 }, () => Array(9).fill(0));
+        this.state.candidates = Array.from({ length: 9 }, () => 
+            Array.from({ length: 9 }, () => new Set())
         );
         this.state.conflicts = Array.from({ length: 9 }, () => Array(9).fill(false));
         this.state.isComplete = false;
@@ -543,10 +591,10 @@ const SudokuGame = {
     },
 
     /**
-     * Use a clue to fill in one empty cell with the correct answer
+     * Use a hint to fill in one empty cell with the correct answer
      */
     useClue() {
-        // Don't allow clues if game is over
+        // Don't allow hints if game is over
         if (this.state.isGameOver) return;
 
         // Find all empty cells (cells without official numbers and without user entries)
@@ -585,10 +633,10 @@ const SudokuGame = {
         // Re-render
         this.render();
 
-        // Flash the cell to indicate the clue
+        // Flash the cell to indicate the hint
         SudokuRenderer.flashCell(row, col, 'success');
 
-        // Select the cell that received the clue
+        // Select the cell that received the hint
         this.selectedRow = row;
         this.selectedCol = col;
         SudokuHighlighting.applyHighlighting(row, col, this.state.solution[row][col], this.state);

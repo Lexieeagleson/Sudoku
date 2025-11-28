@@ -512,6 +512,45 @@ body {
     background: var(--btn-secondary-hover);
 }
 
+/* Modal action buttons */
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.modal-action-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+}
+
+.modal-action-btn:hover {
+    background: var(--highlight-cell);
+    border-color: var(--btn-primary);
+}
+
+.modal-action-btn.warning {
+    color: var(--text-secondary);
+}
+
+.modal-action-btn.warning:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--cell-error);
+    color: var(--cell-error);
+}
+
 /* Celebration modal */
 .celebration {
     text-align: center;
