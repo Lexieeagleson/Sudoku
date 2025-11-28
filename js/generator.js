@@ -104,11 +104,12 @@ const SudokuGenerator = {
         const puzzle = solution.map(row => [...row]);
         
         // Determine how many cells to remove based on difficulty
+        // Easy has most clues (easiest), Super Hard has fewest (hardest)
         const clueRanges = {
-            easy: { min: 50, max: 55 },
-            medium: { min: 35, max: 44 },
-            hard: { min: 27, max: 34 },
-            superhard: { min: 17, max: 26 }
+            easy: { min: 36, max: 40 },
+            medium: { min: 28, max: 32 },
+            hard: { min: 22, max: 26 },
+            superhard: { min: 17, max: 20 }
         };
 
         const range = clueRanges[difficulty] || clueRanges.easy;
