@@ -98,6 +98,17 @@ const SudokuInput = {
         if (this.selectedCell) {
             const { row, col } = this.selectedCell;
             this.onNumberInput(row, col, number);
+            
+            // Clear active state after placing a number (unless in candidate mode)
+            if (!this.candidateMode) {
+                // Blur the active button before clearing state
+                const activeBtn = document.querySelector(`.num-btn[data-number="${this.activeNumber}"]`);
+                if (activeBtn) {
+                    activeBtn.blur();
+                }
+                this.activeNumber = null;
+                this.updateNumberButtonState();
+            }
         }
     },
 
