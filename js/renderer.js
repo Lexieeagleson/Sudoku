@@ -42,8 +42,10 @@ const SudokuRenderer = {
     /**
      * Render the puzzle state
      * @param {Object} state - Current game state
+     * @param {boolean} instantCheckEnabled - Whether instant check is enabled
      */
-    render(state) {
+    render(state, instantCheckEnabled = true) {
+        this.instantCheckEnabled = instantCheckEnabled;
         const { puzzle, userEntries, candidates, official } = state;
 
         for (let row = 0; row < 9; row++) {
@@ -76,12 +78,15 @@ const SudokuRenderer = {
         }
         // Check if user has entered a number
         else if (userEntries[row][col] !== 0) {
-            cell.classList.add('user-entered');
+            // Only add user-entered class (green color) when instant check is enabled
+            if (this.instantCheckEnabled) {
+                cell.classList.add('user-entered');
+            }
             cell.textContent = userEntries[row][col];
             cell.setAttribute('aria-label', `Cell row ${row + 1} column ${col + 1}, your entry ${userEntries[row][col]}`);
             
-            // Check for conflicts
-            if (conflicts && conflicts[row][col]) {
+            // Check for conflicts - only show error styling when instant check is enabled
+            if (this.instantCheckEnabled && conflicts && conflicts[row][col]) {
                 cell.classList.add('error');
             }
         }
