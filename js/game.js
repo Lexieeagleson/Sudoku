@@ -198,12 +198,20 @@ const SudokuGame = {
 
         document.getElementById('lives-toggle').addEventListener('change', (e) => {
             this.settings.livesEnabled = e.target.checked;
+            // Connect lives and instant check - they must both be on or both be off
+            this.settings.instantCheckEnabled = e.target.checked;
+            this.updateSettingsUI();
             this.applySettings();
             this.saveSettings();
+            this.render();
         });
 
         document.getElementById('instant-check-toggle').addEventListener('change', (e) => {
             this.settings.instantCheckEnabled = e.target.checked;
+            // Connect lives and instant check - they must both be on or both be off
+            this.settings.livesEnabled = e.target.checked;
+            this.updateSettingsUI();
+            this.applySettings();
             this.saveSettings();
             this.render();
         });
