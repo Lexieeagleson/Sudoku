@@ -122,6 +122,9 @@ const SudokuGame = {
         document.getElementById('solve-btn').addEventListener('click', () => {
             this.solvePuzzle();
         });
+        document.getElementById('clue-btn').addEventListener('click', () => {
+            this.useClue();
+        });
         document.getElementById('check-btn').addEventListener('click', () => {
             this.checkSolution();
         });
@@ -537,6 +540,61 @@ const SudokuGame = {
         this.render();
         SudokuTimer.stop();
         SudokuInput.updateCompletedNumbers(this.state);
+    },
+
+    /**
+     * Use a clue to fill in one empty cell with the correct answer
+     */
+    useClue() {
+        // Don't allow clues if game is over
+        if (this.state.isGameOver) return;
+
+        // Find all empty cells (cells without official numbers and without user entries)
+        const emptyCells = [];
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (!this.state.official[row][col] && this.state.userEntries[row][col] === 0) {
+                    emptyCells.push({ row, col });
+                }
+            }
+        }
+
+        // If no empty cells, puzzle is complete
+        if (emptyCells.length === 0) return;
+
+        // Pick a random empty cell
+        const randomIndex = Math.floor(Math.random() * emptyCells.length);
+        const { row, col } = emptyCells[randomIndex];
+
+        // Save state for undo
+        SudokuHistory.saveState({
+            userEntries: this.state.userEntries,
+            candidates: this.state.candidates
+        });
+
+        // Fill in the correct answer
+        this.state.userEntries[row][col] = this.state.solution[row][col];
+        this.state.candidates[row][col].clear();
+
+        // Update conflicts
+        this.updateConflicts();
+
+        // Update completed numbers
+        SudokuInput.updateCompletedNumbers(this.state);
+
+        // Re-render
+        this.render();
+
+        // Flash the cell to indicate the clue
+        SudokuRenderer.flashCell(row, col, 'success');
+
+        // Select the cell that received the clue
+        this.selectedRow = row;
+        this.selectedCol = col;
+        SudokuHighlighting.applyHighlighting(row, col, this.state.solution[row][col], this.state);
+
+        // Check for completion
+        this.checkCompletion();
     },
 
     /**
