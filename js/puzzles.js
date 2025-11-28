@@ -5,10 +5,10 @@
  * 
  * Each puzzle has been verified to have exactly one solution
  * 
- * Clue ranges (prefilled numbers):
- * - Easy: 36-40 clues (most prefilled - perfect for beginners)
+ * Clue ranges (prefilled numbers) - Easy has more, Super Hard has fewer:
+ * - Easy: 36-40 clues (more prefilled - perfect for beginners)
  * - Medium: 28-32 clues (moderate challenge)
- * - Hard: 22-26 clues (requires advanced techniques)
+ * - Hard: 22-26 clues (fewer prefilled - requires advanced techniques)
  * - Super Hard: 17-20 clues (fewest prefilled - expert only)
  */
 
