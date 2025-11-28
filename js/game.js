@@ -107,12 +107,9 @@ const SudokuGame = {
             this.toggleCandidateLock();
         });
 
-        // Undo/Redo buttons
+        // Undo button
         document.getElementById('undo-btn').addEventListener('click', () => {
             this.undo();
-        });
-        document.getElementById('redo-btn').addEventListener('click', () => {
-            this.redo();
         });
 
         // Game action buttons
@@ -664,32 +661,11 @@ const SudokuGame = {
     },
 
     /**
-     * Redo the last undone action
-     */
-    redo() {
-        const nextState = SudokuHistory.redo({
-            userEntries: this.state.userEntries,
-            candidates: this.state.candidates
-        });
-
-        if (nextState) {
-            this.state.userEntries = nextState.userEntries;
-            this.state.candidates = nextState.candidates;
-            this.updateConflicts();
-            this.render();
-            SudokuInput.updateCompletedNumbers(this.state);
-        }
-    },
-
-    /**
-     * Update undo/redo button states
+     * Update undo button state
      */
     updateHistoryButtons() {
         const undoBtn = document.getElementById('undo-btn');
-        const redoBtn = document.getElementById('redo-btn');
-
         undoBtn.disabled = !SudokuHistory.canUndo();
-        redoBtn.disabled = !SudokuHistory.canRedo();
     },
 
     /**
@@ -735,6 +711,16 @@ const SudokuGame = {
      * Show the difficulty selection modal
      */
     showDifficultyModal() {
+        // Show/hide Check Progress button based on settings
+        // Only show when instant check is disabled (zen mode or manually turned off)
+        const checkBtn = document.getElementById('check-btn');
+        if (checkBtn) {
+            if (!this.settings.instantCheckEnabled) {
+                checkBtn.style.display = '';
+            } else {
+                checkBtn.style.display = 'none';
+            }
+        }
         this.difficultyModal.classList.add('active');
     },
 
