@@ -7,6 +7,14 @@ const SudokuGame = {
     // Maximum number of lives
     MAX_LIVES: 3,
 
+    // Default settings
+    DEFAULT_SETTINGS: {
+        timerEnabled: true,
+        livesEnabled: true,
+        instantCheckEnabled: true,
+        zenMode: false
+    },
+
     /**
      * Initialize the game
      */
@@ -26,6 +34,9 @@ const SudokuGame = {
             isGameOver: false     // Whether game is over (ran out of lives)
         };
 
+        // Load settings from localStorage or use defaults
+        this.settings = this.loadSettings();
+
         this.selectedRow = -1;
         this.selectedCol = -1;
 
@@ -33,6 +44,7 @@ const SudokuGame = {
         this.initComponents();
         this.setupEventListeners();
         this.loadTheme();
+        this.applySettings();
         
         // Show difficulty modal on first load
         this.showDifficultyModal();
@@ -51,6 +63,9 @@ const SudokuGame = {
         this.winModal = document.getElementById('win-modal');
         this.winTimeDisplay = document.getElementById('win-time-display');
         this.gameOverModal = document.getElementById('game-over-modal');
+        this.settingsModal = document.getElementById('settings-modal');
+        this.timerContainer = document.querySelector('.timer-display');
+        this.livesContainer = document.querySelector('.lives-display');
 
         // Initialize renderer
         SudokuRenderer.init(this.gridContainer);
@@ -154,6 +169,43 @@ const SudokuGame = {
                 this.hideGameOverModal();
             }
         });
+
+        this.settingsModal.addEventListener('click', (e) => {
+            if (e.target === this.settingsModal) {
+                this.hideSettingsModal();
+            }
+        });
+
+        // Settings button
+        document.getElementById('settings-toggle').addEventListener('click', () => {
+            this.showSettingsModal();
+        });
+
+        document.getElementById('close-settings-modal').addEventListener('click', () => {
+            this.hideSettingsModal();
+        });
+
+        // Settings toggles
+        document.getElementById('zen-mode-toggle').addEventListener('change', (e) => {
+            this.setZenMode(e.target.checked);
+        });
+
+        document.getElementById('timer-toggle').addEventListener('change', (e) => {
+            this.settings.timerEnabled = e.target.checked;
+            this.applySettings();
+            this.saveSettings();
+        });
+
+        document.getElementById('lives-toggle').addEventListener('change', (e) => {
+            this.settings.livesEnabled = e.target.checked;
+            this.applySettings();
+            this.saveSettings();
+        });
+
+        document.getElementById('instant-check-toggle').addEventListener('change', (e) => {
+            this.settings.instantCheckEnabled = e.target.checked;
+            this.saveSettings();
+        });
     },
 
     /**
@@ -196,9 +248,11 @@ const SudokuGame = {
         SudokuHistory.clear();
         SudokuHighlighting.clearHighlights();
 
-        // Reset and start timer
+        // Reset and start timer (only if timer is enabled)
         SudokuTimer.reset();
-        SudokuTimer.start();
+        if (this.settings.timerEnabled) {
+            SudokuTimer.start();
+        }
 
         // Update lives display
         this.updateLivesDisplay();
@@ -276,8 +330,15 @@ const SudokuGame = {
                 this.state.userEntries[row][col] = 0;
             } else {
                 // Check if the number is wrong against the solution
-                if (number !== this.state.solution[row][col]) {
-                    this.loseLife(row, col);
+                // Only check immediately if instant check is enabled
+                if (this.settings.instantCheckEnabled && number !== this.state.solution[row][col]) {
+                    // Only lose a life if lives are enabled
+                    if (this.settings.livesEnabled) {
+                        this.loseLife(row, col);
+                    } else {
+                        // Just flash error without losing a life
+                        SudokuRenderer.flashCell(row, col, 'error');
+                    }
                 }
                 this.state.userEntries[row][col] = number;
                 this.state.candidates[row][col].clear();
@@ -647,6 +708,111 @@ const SudokuGame = {
         } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
+    },
+
+    /**
+     * Show the settings modal
+     */
+    showSettingsModal() {
+        this.updateSettingsUI();
+        this.settingsModal.classList.add('active');
+    },
+
+    /**
+     * Hide the settings modal
+     */
+    hideSettingsModal() {
+        this.settingsModal.classList.remove('active');
+    },
+
+    /**
+     * Load settings from localStorage
+     * @returns {Object} Settings object
+     */
+    loadSettings() {
+        const saved = localStorage.getItem('sudoku-settings');
+        if (saved) {
+            try {
+                return { ...this.DEFAULT_SETTINGS, ...JSON.parse(saved) };
+            } catch (e) {
+                return { ...this.DEFAULT_SETTINGS };
+            }
+        }
+        return { ...this.DEFAULT_SETTINGS };
+    },
+
+    /**
+     * Save settings to localStorage
+     */
+    saveSettings() {
+        localStorage.setItem('sudoku-settings', JSON.stringify(this.settings));
+    },
+
+    /**
+     * Update the settings UI to reflect current settings
+     */
+    updateSettingsUI() {
+        document.getElementById('zen-mode-toggle').checked = this.settings.zenMode;
+        document.getElementById('timer-toggle').checked = this.settings.timerEnabled;
+        document.getElementById('lives-toggle').checked = this.settings.livesEnabled;
+        document.getElementById('instant-check-toggle').checked = this.settings.instantCheckEnabled;
+
+        // Disable individual toggles when zen mode is on
+        const disabled = this.settings.zenMode;
+        document.getElementById('timer-toggle').disabled = disabled;
+        document.getElementById('lives-toggle').disabled = disabled;
+        document.getElementById('instant-check-toggle').disabled = disabled;
+    },
+
+    /**
+     * Apply current settings to the game
+     */
+    applySettings() {
+        // Show/hide timer
+        if (this.timerContainer) {
+            if (this.settings.timerEnabled) {
+                this.timerContainer.classList.remove('hidden');
+                // Start timer if game is in progress and not complete
+                if (this.state.puzzle.length > 0 && !this.state.isComplete && !this.state.isGameOver) {
+                    SudokuTimer.start();
+                }
+            } else {
+                this.timerContainer.classList.add('hidden');
+                SudokuTimer.stop();
+            }
+        }
+
+        // Show/hide lives
+        if (this.livesContainer) {
+            if (this.settings.livesEnabled) {
+                this.livesContainer.classList.remove('hidden');
+            } else {
+                this.livesContainer.classList.add('hidden');
+            }
+        }
+    },
+
+    /**
+     * Set Zen mode (turns off timer, lives, and instant check)
+     * @param {boolean} enabled - Whether zen mode is enabled
+     */
+    setZenMode(enabled) {
+        this.settings.zenMode = enabled;
+        
+        if (enabled) {
+            this.settings.timerEnabled = false;
+            this.settings.livesEnabled = false;
+            this.settings.instantCheckEnabled = false;
+        } else {
+            // Restore defaults when turning off zen mode
+            this.settings.timerEnabled = true;
+            this.settings.livesEnabled = true;
+            this.settings.instantCheckEnabled = true;
+        }
+        
+        this.updateSettingsUI();
+        this.applySettings();
+        this.saveSettings();
     }
 };
 

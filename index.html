@@ -11,10 +11,15 @@
         <!-- Header with title and controls -->
         <header class="header">
             <h1 class="title">Sudoku</h1>
-            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-                <span class="sun-icon">☀️</span>
-                <span class="moon-icon">🌙</span>
-            </button>
+            <div class="header-buttons">
+                <button id="settings-toggle" class="settings-toggle" aria-label="Open settings">
+                    <span class="settings-icon">⚙️</span>
+                </button>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                    <span class="sun-icon">☀️</span>
+                    <span class="moon-icon">🌙</span>
+                </button>
+            </div>
         </header>
 
         <!-- Game status bar -->
@@ -125,6 +130,57 @@
                 <h2>💔 Game Over 💔</h2>
                 <p>You ran out of lives!</p>
                 <button id="restart-btn" class="action-btn primary">Try Again</button>
+            </div>
+        </div>
+
+        <!-- Settings modal -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content settings">
+                <h2>⚙️ Settings</h2>
+                <div class="settings-options">
+                    <div class="setting-item zen-mode">
+                        <div class="setting-info">
+                            <span class="setting-title">🧘 Zen Mode</span>
+                            <span class="setting-desc">Relax with no timer, lives, or instant checking</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="zen-mode-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-divider"></div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title">⏱️ Timer</span>
+                            <span class="setting-desc">Show and track time</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="timer-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title">❤️ Lives</span>
+                            <span class="setting-desc">Lose lives on wrong answers</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="lives-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title">✓ Instant Check</span>
+                            <span class="setting-desc">Show wrong answers immediately</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="instant-check-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <button id="close-settings-modal" class="close-btn">Close</button>
             </div>
         </div>
     </div>
