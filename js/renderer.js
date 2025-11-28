@@ -45,13 +45,12 @@ const SudokuRenderer = {
      * @param {boolean} instantCheckEnabled - Whether instant check is enabled
      */
     render(state, instantCheckEnabled = true) {
-        this.instantCheckEnabled = instantCheckEnabled;
         const { puzzle, userEntries, candidates, official } = state;
 
         for (let row = 0; row < 9; row++) {
             for (let col = 0; col < 9; col++) {
                 const cell = this.cells[row][col];
-                this.renderCell(cell, row, col, state);
+                this.renderCell(cell, row, col, state, instantCheckEnabled);
             }
         }
     },
@@ -62,8 +61,9 @@ const SudokuRenderer = {
      * @param {number} row - Row index
      * @param {number} col - Column index
      * @param {Object} state - Game state
+     * @param {boolean} instantCheckEnabled - Whether instant check is enabled
      */
-    renderCell(cell, row, col, state) {
+    renderCell(cell, row, col, state, instantCheckEnabled = true) {
         const { puzzle, userEntries, candidates, official, conflicts } = state;
         
         // Clear previous content and classes
@@ -79,14 +79,14 @@ const SudokuRenderer = {
         // Check if user has entered a number
         else if (userEntries[row][col] !== 0) {
             // Only add user-entered class (green color) when instant check is enabled
-            if (this.instantCheckEnabled) {
+            if (instantCheckEnabled) {
                 cell.classList.add('user-entered');
             }
             cell.textContent = userEntries[row][col];
             cell.setAttribute('aria-label', `Cell row ${row + 1} column ${col + 1}, your entry ${userEntries[row][col]}`);
             
             // Check for conflicts - only show error styling when instant check is enabled
-            if (this.instantCheckEnabled && conflicts && conflicts[row][col]) {
+            if (instantCheckEnabled && conflicts && conflicts[row][col]) {
                 cell.classList.add('error');
             }
         }
