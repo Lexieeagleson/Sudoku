@@ -805,9 +805,10 @@ const SudokuGame = {
             this.settings.instantCheckEnabled = false;
         } else {
             // Restore defaults when turning off zen mode
-            this.settings.timerEnabled = true;
-            this.settings.livesEnabled = true;
-            this.settings.instantCheckEnabled = true;
+            const defaults = this.DEFAULT_SETTINGS;
+            this.settings.timerEnabled = defaults.timerEnabled;
+            this.settings.livesEnabled = defaults.livesEnabled;
+            this.settings.instantCheckEnabled = defaults.instantCheckEnabled;
         }
         
         this.updateSettingsUI();
