@@ -101,11 +101,13 @@ const SudokuInput = {
             
             // Clear active state after placing a number (unless in candidate mode)
             if (!this.candidateMode) {
+                // Blur the active button before clearing state
+                const activeBtn = document.querySelector(`.num-btn[data-number="${this.activeNumber}"]`);
+                if (activeBtn) {
+                    activeBtn.blur();
+                }
                 this.activeNumber = null;
-                document.querySelectorAll('.num-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    btn.blur();
-                });
+                this.updateNumberButtonState();
             }
         }
     },
