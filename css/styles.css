@@ -864,3 +864,59 @@ body {
         background-color: rgba(251, 191, 36, 0.6);
     }
 }
+
+/* Pause button styles */
+.pause-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    margin-left: 8px;
+    border-radius: 4px;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pause-btn:hover {
+    background: var(--highlight-cell);
+}
+
+.timer-display.hidden .pause-btn {
+    display: none;
+}
+
+/* Pause modal styles */
+.pause-modal {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.pause-content {
+    text-align: center;
+    max-width: 350px;
+}
+
+.pause-content h2 {
+    font-size: 1.75rem;
+    margin-bottom: 12px;
+}
+
+.pause-message {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    font-size: 1rem;
+}
+
+.pause-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pause-actions .action-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+}

@@ -65,6 +65,7 @@ const SudokuGame = {
         this.gameOverModal = document.getElementById('game-over-modal');
         this.settingsModal = document.getElementById('settings-modal');
         this.hintModal = document.getElementById('hint-modal');
+        this.pauseModal = document.getElementById('pause-modal');
         this.timerContainer = document.querySelector('.timer-display');
         this.livesContainer = document.querySelector('.lives-display');
         
@@ -239,6 +240,31 @@ const SudokuGame = {
             this.applySettings();
             this.saveSettings();
             this.render();
+        });
+
+        // Pause button
+        document.getElementById('pause-btn').addEventListener('click', () => {
+            this.pauseGame();
+        });
+
+        // Pause modal buttons
+        document.getElementById('unpause-btn').addEventListener('click', () => {
+            this.unpauseGame();
+        });
+
+        document.getElementById('pause-hint-btn').addEventListener('click', () => {
+            this.hidePauseModal();
+            this.useClue();
+        });
+
+        document.getElementById('pause-reset-btn').addEventListener('click', () => {
+            this.hidePauseModal();
+            this.resetGame();
+        });
+
+        document.getElementById('pause-new-game-btn').addEventListener('click', () => {
+            this.hidePauseModal();
+            this.showDifficultyModal();
         });
     },
 
@@ -1010,6 +1036,45 @@ const SudokuGame = {
         this.updateSettingsUI();
         this.applySettings();
         this.saveSettings();
+    },
+
+    /**
+     * Pause the game
+     */
+    pauseGame() {
+        // Only pause if timer is enabled and game is in progress
+        if (!this.settings.timerEnabled) return;
+        if (this.state.puzzle.length === 0) return;
+        if (this.state.isComplete || this.state.isGameOver) return;
+
+        SudokuTimer.pause();
+        this.showPauseModal();
+    },
+
+    /**
+     * Unpause/resume the game
+     */
+    unpauseGame() {
+        this.hidePauseModal();
+        
+        // Only resume timer if timer is enabled
+        if (this.settings.timerEnabled && !this.state.isComplete && !this.state.isGameOver) {
+            SudokuTimer.resume();
+        }
+    },
+
+    /**
+     * Show the pause modal
+     */
+    showPauseModal() {
+        this.pauseModal.classList.add('active');
+    },
+
+    /**
+     * Hide the pause modal
+     */
+    hidePauseModal() {
+        this.pauseModal.classList.remove('active');
     }
 };
 

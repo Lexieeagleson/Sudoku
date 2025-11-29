@@ -35,6 +35,7 @@
             <div class="timer-display">
                 <span class="label">Time:</span>
                 <span id="timer" class="value">00:00</span>
+                <button id="pause-btn" class="pause-btn" aria-label="Pause game">⏸️</button>
             </div>
         </div>
 
@@ -199,6 +200,20 @@
                 <div class="hint-actions">
                     <button id="apply-hint-btn" class="action-btn primary">Apply Hint</button>
                     <button id="close-hint-modal" class="close-btn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause modal -->
+        <div id="pause-modal" class="modal pause-modal">
+            <div class="modal-content pause-content">
+                <h2>⏸️ Game Paused</h2>
+                <p class="pause-message">Take a break! Your progress is saved.</p>
+                <div class="pause-actions">
+                    <button id="unpause-btn" class="action-btn primary">▶️ Resume</button>
+                    <button id="pause-hint-btn" class="action-btn secondary">💡 Hint</button>
+                    <button id="pause-reset-btn" class="action-btn secondary">🔄 Reset</button>
+                    <button id="pause-new-game-btn" class="action-btn secondary">🎮 New Game</button>
                 </div>
             </div>
         </div>
