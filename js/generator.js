@@ -132,9 +132,9 @@ const SudokuGenerator = {
         // Create a balanced removal order by interleaving cells from each box
         const positions = [];
         const maxBoxSize = 9;
+        // Pre-shuffle box order once for randomness
+        const boxOrder = this.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8]);
         for (let i = 0; i < maxBoxSize; i++) {
-            // Shuffle box order for each round to add more randomness
-            const boxOrder = this.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8]);
             for (const boxIndex of boxOrder) {
                 if (i < boxes[boxIndex].length) {
                     positions.push(boxes[boxIndex][i]);
