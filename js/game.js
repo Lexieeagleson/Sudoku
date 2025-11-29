@@ -106,11 +106,6 @@ const SudokuGame = {
             this.toggleCandidateMode();
         });
 
-        // Lock candidate toggle
-        document.getElementById('lock-candidate').addEventListener('click', () => {
-            this.toggleCandidateLock();
-        });
-
         // Undo button
         document.getElementById('undo-btn').addEventListener('click', () => {
             this.undo();
@@ -792,26 +787,8 @@ const SudokuGame = {
     toggleCandidateMode() {
         const isEnabled = SudokuInput.toggleCandidateMode();
         const btn = document.getElementById('candidate-toggle');
-        const lockBtn = document.getElementById('lock-candidate');
         
         if (isEnabled) {
-            btn.classList.add('active');
-            lockBtn.disabled = false;
-        } else {
-            btn.classList.remove('active');
-            lockBtn.classList.remove('active');
-            lockBtn.disabled = true;
-        }
-    },
-
-    /**
-     * Toggle candidate lock
-     */
-    toggleCandidateLock() {
-        const locked = SudokuInput.toggleCandidateLock();
-        const btn = document.getElementById('lock-candidate');
-        
-        if (locked !== null) {
             btn.classList.add('active');
         } else {
             btn.classList.remove('active');
