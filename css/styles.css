@@ -794,3 +794,77 @@ body {
 .lives-display.hidden {
     display: none;
 }
+
+/* Hint modal styles */
+.hint-modal {
+    max-width: 450px;
+}
+
+.hint-modal h2 {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.hint-technique {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+    border-radius: var(--border-radius);
+    margin-bottom: 16px;
+}
+
+.technique-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.technique-name {
+    font-weight: 600;
+    color: var(--btn-primary);
+}
+
+.hint-explanation {
+    padding: 16px;
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    white-space: pre-line;
+}
+
+.hint-explanation strong {
+    color: var(--btn-primary);
+}
+
+.hint-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hint-actions .action-btn {
+    width: 100%;
+}
+
+.hint-actions .close-btn {
+    margin-top: 4px;
+}
+
+/* Hint highlight cell state */
+.cell.hint-highlight {
+    background-color: rgba(251, 191, 36, 0.5) !important;
+    animation: hintPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+    0%, 100% {
+        background-color: rgba(251, 191, 36, 0.3);
+    }
+    50% {
+        background-color: rgba(251, 191, 36, 0.6);
+    }
+}

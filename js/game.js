@@ -64,8 +64,12 @@ const SudokuGame = {
         this.winTimeDisplay = document.getElementById('win-time-display');
         this.gameOverModal = document.getElementById('game-over-modal');
         this.settingsModal = document.getElementById('settings-modal');
+        this.hintModal = document.getElementById('hint-modal');
         this.timerContainer = document.querySelector('.timer-display');
         this.livesContainer = document.querySelector('.lives-display');
+        
+        // Current hint data
+        this.currentHint = null;
 
         // Initialize renderer
         SudokuRenderer.init(this.gridContainer);
@@ -187,6 +191,12 @@ const SudokuGame = {
             }
         });
 
+        this.hintModal.addEventListener('click', (e) => {
+            if (e.target === this.hintModal) {
+                this.hideHintModal();
+            }
+        });
+
         // Settings button
         document.getElementById('settings-toggle').addEventListener('click', () => {
             this.showSettingsModal();
@@ -194,6 +204,15 @@ const SudokuGame = {
 
         document.getElementById('close-settings-modal').addEventListener('click', () => {
             this.hideSettingsModal();
+        });
+
+        // Hint modal buttons
+        document.getElementById('apply-hint-btn').addEventListener('click', () => {
+            this.applyHint();
+        });
+
+        document.getElementById('close-hint-modal').addEventListener('click', () => {
+            this.hideHintModal();
         });
 
         // Settings toggles
@@ -614,28 +633,95 @@ const SudokuGame = {
     },
 
     /**
-     * Use a hint to fill in one empty cell with the correct answer
+     * Use a hint - find a cell with an explanation and show modal
      */
     useClue() {
         // Don't allow hints if game is over
         if (this.state.isGameOver) return;
 
-        // Find all empty cells (cells without official numbers and without user entries)
-        const emptyCells = [];
+        // Find all empty cells to check if puzzle is complete
+        let hasEmptyCells = false;
         for (let row = 0; row < 9; row++) {
             for (let col = 0; col < 9; col++) {
                 if (!this.state.official[row][col] && this.state.userEntries[row][col] === 0) {
-                    emptyCells.push({ row, col });
+                    hasEmptyCells = true;
+                    break;
                 }
             }
+            if (hasEmptyCells) break;
         }
 
         // If no empty cells, puzzle is complete
-        if (emptyCells.length === 0) return;
+        if (!hasEmptyCells) return;
 
-        // Pick a random empty cell
-        const randomIndex = Math.floor(Math.random() * emptyCells.length);
-        const { row, col } = emptyCells[randomIndex];
+        // Find a hint with explanation
+        const hint = SudokuHints.findHint(this.state);
+        
+        if (!hint) return;
+
+        // Store the hint for later application
+        this.currentHint = hint;
+
+        // Highlight the hint cell
+        this.highlightHintCell(hint.row, hint.col);
+
+        // Show the hint modal
+        this.showHintModal(hint);
+    },
+
+    /**
+     * Highlight the cell that the hint is for
+     * @param {number} row - Row index
+     * @param {number} col - Column index
+     */
+    highlightHintCell(row, col) {
+        // Clear previous hint highlights
+        this.clearHintHighlight();
+        
+        // Add hint highlight to the cell
+        const cell = SudokuRenderer.getCell(row, col);
+        if (cell) {
+            cell.classList.add('hint-highlight');
+        }
+    },
+
+    /**
+     * Clear hint highlight from all cells
+     */
+    clearHintHighlight() {
+        const cells = SudokuRenderer.getAllCells();
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                cells[r][c].classList.remove('hint-highlight');
+            }
+        }
+    },
+
+    /**
+     * Show the hint modal with explanation
+     * @param {Object} hint - Hint object with technique and explanation
+     */
+    showHintModal(hint) {
+        document.getElementById('hint-technique-name').textContent = hint.technique;
+        document.getElementById('hint-explanation').innerHTML = hint.explanation.replace(/\n/g, '<br>');
+        this.hintModal.classList.add('active');
+    },
+
+    /**
+     * Hide the hint modal
+     */
+    hideHintModal() {
+        this.hintModal.classList.remove('active');
+        this.clearHintHighlight();
+    },
+
+    /**
+     * Apply the current hint to the puzzle
+     */
+    applyHint() {
+        if (!this.currentHint) return;
+
+        const { row, col, number } = this.currentHint;
 
         // Save state for undo
         SudokuHistory.saveState({
@@ -644,7 +730,7 @@ const SudokuGame = {
         });
 
         // Fill in the correct answer
-        this.state.userEntries[row][col] = this.state.solution[row][col];
+        this.state.userEntries[row][col] = number;
         this.state.candidates[row][col].clear();
 
         // Update conflicts
@@ -656,13 +742,19 @@ const SudokuGame = {
         // Re-render
         this.render();
 
-        // Flash the cell to indicate the hint
+        // Flash the cell to indicate success
         SudokuRenderer.flashCell(row, col, 'success');
 
         // Select the cell that received the hint
         this.selectedRow = row;
         this.selectedCol = col;
-        SudokuHighlighting.applyHighlighting(row, col, this.state.solution[row][col], this.state);
+        SudokuHighlighting.applyHighlighting(row, col, number, this.state);
+
+        // Hide the hint modal
+        this.hideHintModal();
+
+        // Clear current hint
+        this.currentHint = null;
 
         // Check for completion
         this.checkCompletion();
