@@ -325,55 +325,51 @@ body {
     border-color: var(--btn-secondary-hover);
 }
 
-/* Controls */
-.controls {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.mode-controls, .action-controls {
+/* Controls Toolbar */
+.controls-toolbar {
     display: flex;
     gap: 8px;
+    justify-content: space-between;
 }
 
-.control-btn {
+.toolbar-btn {
     flex: 1;
     background: var(--bg-secondary);
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: 10px 12px;
+    padding: 10px 8px;
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 4px;
     transition: var(--transition);
     color: var(--text-primary);
 }
 
-.control-btn:hover:not(:disabled) {
+.toolbar-btn:hover:not(:disabled) {
     background: var(--highlight-cell);
     border-color: var(--btn-primary);
 }
 
-.control-btn:disabled {
+.toolbar-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.control-btn.active {
+.toolbar-btn.active {
     background: var(--btn-active);
     color: white;
     border-color: var(--btn-active);
 }
 
-.btn-icon {
-    font-size: 1.1rem;
+.toolbar-icon {
+    font-size: 1.2rem;
 }
 
-.btn-text {
-    font-size: 0.875rem;
+.toolbar-text {
+    font-size: 0.75rem;
     font-weight: 500;
 }
 

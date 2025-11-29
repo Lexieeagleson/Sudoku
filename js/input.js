@@ -21,7 +21,6 @@ const SudokuInput = {
         this.draggedCells = new Set();
         this.selectedCell = null;
         this.candidateMode = false;
-        this.lockedCandidate = null;
         this.activeNumber = null;
 
         this.setupEventListeners();
@@ -88,11 +87,6 @@ const SudokuInput = {
                 btn.classList.add('active');
             }
         });
-
-        // If in candidate mode with locked candidate, update the locked number
-        if (this.candidateMode && this.lockedCandidate !== null) {
-            this.lockedCandidate = number;
-        }
 
         // If a cell is selected, input the number
         if (this.selectedCell) {
@@ -290,11 +284,6 @@ const SudokuInput = {
      */
     toggleCandidateMode() {
         this.candidateMode = !this.candidateMode;
-        
-        if (!this.candidateMode) {
-            this.lockedCandidate = null;
-        }
-        
         return this.candidateMode;
     },
 
@@ -304,30 +293,6 @@ const SudokuInput = {
      */
     setCandidateMode(enabled) {
         this.candidateMode = enabled;
-        if (!enabled) {
-            this.lockedCandidate = null;
-        }
-    },
-
-    /**
-     * Toggle candidate lock
-     * @returns {number|null} Locked candidate number or null
-     */
-    toggleCandidateLock() {
-        if (this.lockedCandidate !== null) {
-            this.lockedCandidate = null;
-        } else if (this.activeNumber > 0) {
-            this.lockedCandidate = this.activeNumber;
-        }
-        return this.lockedCandidate;
-    },
-
-    /**
-     * Set locked candidate
-     * @param {number|null} number - Number to lock or null to unlock
-     */
-    setLockedCandidate(number) {
-        this.lockedCandidate = number;
     },
 
     /**
@@ -336,14 +301,6 @@ const SudokuInput = {
      */
     isCandidateMode() {
         return this.candidateMode;
-    },
-
-    /**
-     * Get locked candidate number
-     * @returns {number|null} Locked candidate or null
-     */
-    getLockedCandidate() {
-        return this.lockedCandidate;
     },
 
     /**

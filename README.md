@@ -18,7 +18,6 @@ A fully functional, interactive web-based Sudoku game with clean UI, large reada
 ### Candidate Mode
 - Toggle pencil/candidate mode to enter multiple possible numbers in a cell
 - **Drag Selection**: In candidate mode, drag across multiple cells to quickly add candidates
-- **Lock Candidate**: Lock a specific number to quickly add it to multiple cells
 
 ### Intelligent Highlighting
 - **Number Highlighting**: Tap any number to highlight all matching numbers across the board
