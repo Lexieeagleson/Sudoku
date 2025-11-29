@@ -1,22 +1,51 @@
 /**
  * Sudoku Puzzle Generator
- * Generates valid Sudoku puzzles with a single unique solution
+ * Generates valid Sudoku puzzles with a single unique solution.
+ * 
+ * Validation Rules:
+ * - All rows must contain unique numbers from 1-9 (no duplicates)
+ * - All columns must contain unique numbers from 1-9 (no duplicates)
+ * - All 3x3 subgrids must contain unique numbers from 1-9 (no duplicates)
+ * 
+ * The generator uses a backtracking algorithm that inherently ensures these
+ * rules are followed during grid generation. Additional validation methods
+ * are provided to verify grid correctness after generation.
  */
 
 const SudokuGenerator = {
     /**
-     * Generate a complete valid Sudoku solution
-     * Uses backtracking algorithm
+     * Generate a complete valid Sudoku solution.
+     * Uses backtracking algorithm and validates the result.
+     * 
+     * Validation is performed after generation to confirm:
+     * - All 9 rows contain unique numbers 1-9
+     * - All 9 columns contain unique numbers 1-9
+     * - All 9 3x3 subgrids contain unique numbers 1-9
+     * 
      * @returns {Array} 9x9 solved Sudoku grid
+     * @throws {Error} If grid generation fails validation (should never happen)
      */
     generateSolution() {
         const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
         this.fillGrid(grid);
+        
+        // Validate the generated solution to ensure correctness
+        if (!this.isValidGrid(grid)) {
+            throw new Error('Generated grid failed validation - this should not happen');
+        }
+        
         return grid;
     },
 
     /**
-     * Fill grid using backtracking with randomization
+     * Fill grid using backtracking with randomization.
+     * 
+     * The backtracking algorithm ensures Sudoku rules are followed:
+     * - Before placing any number, isValidPlacement() checks that the number
+     *   doesn't already exist in the same row, column, or 3x3 subgrid
+     * - If a placement leads to a dead end, the algorithm backtracks and tries
+     *   a different number, ensuring a valid solution is always found
+     * 
      * @param {Array} grid - 9x9 grid to fill
      * @returns {boolean} Success status
      */
@@ -28,6 +57,7 @@ const SudokuGenerator = {
         const numbers = this.shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
         for (const num of numbers) {
+            // isValidPlacement ensures no duplicates in row, column, or subgrid
             if (this.isValidPlacement(grid, row, col, num)) {
                 grid[row][col] = num;
                 if (this.fillGrid(grid)) return true;
@@ -81,6 +111,121 @@ const SudokuGenerator = {
     },
 
     /**
+     * Validate a single row contains unique numbers 1-9 with no duplicates.
+     * Empty cells (0) are allowed for puzzle validation.
+     * 
+     * @param {Array} grid - 9x9 grid
+     * @param {number} rowIndex - Row index (0-8)
+     * @returns {boolean} Whether the row is valid
+     */
+    validateRow(grid, rowIndex) {
+        const seen = new Set();
+        for (let col = 0; col < 9; col++) {
+            const num = grid[rowIndex][col];
+            if (num === 0) continue; // Skip empty cells
+            if (num < 1 || num > 9) return false; // Invalid number
+            if (seen.has(num)) return false; // Duplicate found
+            seen.add(num);
+        }
+        return true;
+    },
+
+    /**
+     * Validate a single column contains unique numbers 1-9 with no duplicates.
+     * Empty cells (0) are allowed for puzzle validation.
+     * 
+     * @param {Array} grid - 9x9 grid
+     * @param {number} colIndex - Column index (0-8)
+     * @returns {boolean} Whether the column is valid
+     */
+    validateColumn(grid, colIndex) {
+        const seen = new Set();
+        for (let row = 0; row < 9; row++) {
+            const num = grid[row][colIndex];
+            if (num === 0) continue; // Skip empty cells
+            if (num < 1 || num > 9) return false; // Invalid number
+            if (seen.has(num)) return false; // Duplicate found
+            seen.add(num);
+        }
+        return true;
+    },
+
+    /**
+     * Validate a single 3x3 subgrid contains unique numbers 1-9 with no duplicates.
+     * Empty cells (0) are allowed for puzzle validation.
+     * 
+     * @param {Array} grid - 9x9 grid
+     * @param {number} boxStartRow - Starting row of the 3x3 box (0, 3, or 6)
+     * @param {number} boxStartCol - Starting column of the 3x3 box (0, 3, or 6)
+     * @returns {boolean} Whether the subgrid is valid
+     */
+    validateSubgrid(grid, boxStartRow, boxStartCol) {
+        const seen = new Set();
+        for (let r = boxStartRow; r < boxStartRow + 3; r++) {
+            for (let c = boxStartCol; c < boxStartCol + 3; c++) {
+                const num = grid[r][c];
+                if (num === 0) continue; // Skip empty cells
+                if (num < 1 || num > 9) return false; // Invalid number
+                if (seen.has(num)) return false; // Duplicate found
+                seen.add(num);
+            }
+        }
+        return true;
+    },
+
+    /**
+     * Validate the entire Sudoku grid follows all game rules.
+     * 
+     * This method checks that:
+     * 1. All 9 rows contain unique numbers (no duplicates)
+     * 2. All 9 columns contain unique numbers (no duplicates)
+     * 3. All 9 3x3 subgrids contain unique numbers (no duplicates)
+     * 4. All filled cells contain valid numbers (1-9)
+     * 
+     * For a complete solution, also verifies all cells are filled.
+     * For a puzzle with empty cells (0), validates only filled cells.
+     * 
+     * @param {Array} grid - 9x9 grid to validate
+     * @param {boolean} requireComplete - If true, requires all cells to be filled (default: true)
+     * @returns {boolean} Whether the grid is valid
+     */
+    isValidGrid(grid, requireComplete = true) {
+        // Check grid dimensions
+        if (!grid || grid.length !== 9) return false;
+        for (let row = 0; row < 9; row++) {
+            if (!grid[row] || grid[row].length !== 9) return false;
+        }
+
+        // If requiring complete grid, check no empty cells
+        if (requireComplete) {
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    if (grid[row][col] === 0) return false;
+                }
+            }
+        }
+
+        // Validate all rows
+        for (let row = 0; row < 9; row++) {
+            if (!this.validateRow(grid, row)) return false;
+        }
+
+        // Validate all columns
+        for (let col = 0; col < 9; col++) {
+            if (!this.validateColumn(grid, col)) return false;
+        }
+
+        // Validate all 3x3 subgrids
+        for (let boxRow = 0; boxRow < 9; boxRow += 3) {
+            for (let boxCol = 0; boxCol < 9; boxCol += 3) {
+                if (!this.validateSubgrid(grid, boxRow, boxCol)) return false;
+            }
+        }
+
+        return true;
+    },
+
+    /**
      * Fisher-Yates shuffle algorithm
      * @param {Array} array - Array to shuffle
      * @returns {Array} Shuffled array
@@ -95,12 +240,26 @@ const SudokuGenerator = {
     },
 
     /**
-     * Generate a puzzle by removing numbers from a complete solution
-     * Ensures clues are spread throughout the grid across all 3x3 boxes
-     * @param {string} difficulty - Difficulty level
+     * Generate a puzzle by removing numbers from a complete solution.
+     * 
+     * The puzzle generation process ensures valid Sudoku rules:
+     * 1. Starts with a fully validated solution (all rows, columns, subgrids valid)
+     * 2. Removes cells to create the puzzle while maintaining validity
+     * 3. For harder difficulties, verifies unique solution after each removal
+     * 4. Final puzzle is validated to ensure no duplicate numbers
+     * 
+     * Clue ranges by difficulty:
+     * - Easy: 45-50 clues (most prefilled - perfect for beginners)
+     * - Medium: 28-32 clues (moderate challenge)
+     * - Hard: 22-26 clues (fewer prefilled - requires advanced techniques)
+     * - Super Hard: 17-20 clues (fewest prefilled - expert only)
+     * 
+     * @param {string} difficulty - Difficulty level ('easy', 'medium', 'hard', 'superhard')
      * @returns {Object} Object with puzzle and solution arrays
+     * @throws {Error} If puzzle generation fails validation
      */
     generatePuzzle(difficulty) {
+        // Generate and validate a complete solution
         const solution = this.generateSolution();
         const puzzle = solution.map(row => [...row]);
         
@@ -160,6 +319,11 @@ const SudokuGenerator = {
             }
             
             removed++;
+        }
+
+        // Validate the final puzzle (allowing empty cells)
+        if (!this.isValidGrid(puzzle, false)) {
+            throw new Error('Generated puzzle failed validation - this should not happen');
         }
 
         return { puzzle, solution };
