@@ -192,12 +192,6 @@ const SudokuHints = {
         let explanation = `This cell at Row ${rowNum}, Column ${colNum} can only be <strong>${number}</strong>.\n\n`;
         explanation += `<strong>Why?</strong> Looking at this cell:\n`;
         
-        const allEliminated = new Set([...eliminatedBy.byRow, ...eliminatedBy.byCol, ...eliminatedBy.byBox]);
-        const remaining = [];
-        for (let n = 1; n <= 9; n++) {
-            if (!allEliminated.has(n)) remaining.push(n);
-        }
-        
         if (eliminatedBy.byRow.size > 0) {
             explanation += `• Row ${rowNum} already has: ${[...eliminatedBy.byRow].sort((a,b) => a-b).join(', ')}\n`;
         }
@@ -434,7 +428,6 @@ const SudokuHints = {
     buildHiddenSingleBoxExplanation(row, col, number, candidates, boxStartRow, boxStartCol) {
         const rowNum = row + 1;
         const colNum = col + 1;
-        const boxNumber = Math.floor(boxStartRow / 3) * 3 + Math.floor(boxStartCol / 3) + 1;
         
         let explanation = `The number <strong>${number}</strong> must go in Row ${rowNum}, Column ${colNum}.\n\n`;
         explanation += `<strong>Why?</strong> In this 3×3 box, the number ${number} must appear somewhere.\n\n`;
