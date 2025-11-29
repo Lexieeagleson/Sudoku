@@ -74,16 +74,13 @@
                     <span class="btn-icon">↩️</span>
                     <span class="btn-text">Undo</span>
                 </button>
-                <button id="redo-btn" class="control-btn" disabled>
-                    <span class="btn-icon">↪️</span>
-                    <span class="btn-text">Redo</span>
-                </button>
             </div>
         </div>
 
         <!-- Game actions -->
         <div class="game-actions">
             <button id="new-game-btn" class="action-btn primary">New Game</button>
+            <button id="clue-btn" class="action-btn secondary">💡 Hint</button>
             <button id="reset-btn" class="action-btn secondary">Reset</button>
             <button id="solve-btn" class="action-btn secondary">Solve</button>
             <button id="check-btn" class="action-btn secondary">Check</button>
@@ -110,6 +107,11 @@
                         <span class="diff-title">Super Hard</span>
                         <span class="diff-desc">Expert only</span>
                     </button>
+                </div>
+                <div class="modal-actions">
+                    <button id="restart-current-btn" class="modal-action-btn">🔄 Restart Current</button>
+                    <button id="check-btn" class="modal-action-btn">✓ Check Progress</button>
+                    <button id="solve-btn" class="modal-action-btn warning">🔓 Reveal Solution</button>
                 </div>
                 <button id="close-modal" class="close-btn">Cancel</button>
             </div>

@@ -107,12 +107,9 @@ const SudokuGame = {
             this.toggleCandidateLock();
         });
 
-        // Undo/Redo buttons
+        // Undo button
         document.getElementById('undo-btn').addEventListener('click', () => {
             this.undo();
-        });
-        document.getElementById('redo-btn').addEventListener('click', () => {
-            this.redo();
         });
 
         // Game action buttons
@@ -124,9 +121,14 @@ const SudokuGame = {
         });
         document.getElementById('solve-btn').addEventListener('click', () => {
             this.solvePuzzle();
+            this.hideDifficultyModal();
+        });
+        document.getElementById('clue-btn').addEventListener('click', () => {
+            this.useClue();
         });
         document.getElementById('check-btn').addEventListener('click', () => {
             this.checkSolution();
+            this.hideDifficultyModal();
         });
 
         // Difficulty modal buttons
@@ -139,6 +141,12 @@ const SudokuGame = {
         });
 
         document.getElementById('close-modal').addEventListener('click', () => {
+            this.hideDifficultyModal();
+        });
+
+        // Restart current game button
+        document.getElementById('restart-current-btn').addEventListener('click', () => {
+            this.restartCurrentGame();
             this.hideDifficultyModal();
         });
 
@@ -267,6 +275,46 @@ const SudokuGame = {
      */
     _resetPlayableState() {
         // Reset user entries and candidates
+        this.state.userEntries = Array.from({ length: 9 }, () => Array(9).fill(0));
+        this.state.candidates = Array.from({ length: 9 }, () => 
+            Array.from({ length: 9 }, () => new Set())
+        );
+        this.state.conflicts = Array.from({ length: 9 }, () => Array(9).fill(false));
+        this.state.isComplete = false;
+        this.state.lives = this.MAX_LIVES;
+        this.state.isGameOver = false;
+
+        // Clear selection and history
+        this.selectedRow = -1;
+        this.selectedCol = -1;
+        SudokuInput.clearSelection();
+        SudokuHistory.clear();
+        SudokuHighlighting.clearHighlights();
+
+        // Reset and start timer (only if timer is enabled)
+        SudokuTimer.reset();
+        if (this.settings.timerEnabled) {
+            SudokuTimer.start();
+        }
+
+        // Update lives display
+        this.updateLivesDisplay();
+
+        // Update completed numbers
+        SudokuInput.updateCompletedNumbers(this.state);
+
+        // Render the grid
+        this.render();
+    },
+
+    /**
+     * Restart the current game (clear user entries, keep same puzzle)
+     */
+    restartCurrentGame() {
+        // Don't restart if no game is in progress
+        if (this.state.puzzle.length === 0) return;
+
+        // Clear user entries and candidates
         this.state.userEntries = Array.from({ length: 9 }, () => Array(9).fill(0));
         this.state.candidates = Array.from({ length: 9 }, () => 
             Array.from({ length: 9 }, () => new Set())
@@ -566,6 +614,61 @@ const SudokuGame = {
     },
 
     /**
+     * Use a hint to fill in one empty cell with the correct answer
+     */
+    useClue() {
+        // Don't allow hints if game is over
+        if (this.state.isGameOver) return;
+
+        // Find all empty cells (cells without official numbers and without user entries)
+        const emptyCells = [];
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (!this.state.official[row][col] && this.state.userEntries[row][col] === 0) {
+                    emptyCells.push({ row, col });
+                }
+            }
+        }
+
+        // If no empty cells, puzzle is complete
+        if (emptyCells.length === 0) return;
+
+        // Pick a random empty cell
+        const randomIndex = Math.floor(Math.random() * emptyCells.length);
+        const { row, col } = emptyCells[randomIndex];
+
+        // Save state for undo
+        SudokuHistory.saveState({
+            userEntries: this.state.userEntries,
+            candidates: this.state.candidates
+        });
+
+        // Fill in the correct answer
+        this.state.userEntries[row][col] = this.state.solution[row][col];
+        this.state.candidates[row][col].clear();
+
+        // Update conflicts
+        this.updateConflicts();
+
+        // Update completed numbers
+        SudokuInput.updateCompletedNumbers(this.state);
+
+        // Re-render
+        this.render();
+
+        // Flash the cell to indicate the hint
+        SudokuRenderer.flashCell(row, col, 'success');
+
+        // Select the cell that received the hint
+        this.selectedRow = row;
+        this.selectedCol = col;
+        SudokuHighlighting.applyHighlighting(row, col, this.state.solution[row][col], this.state);
+
+        // Check for completion
+        this.checkCompletion();
+    },
+
+    /**
      * Undo the last action
      */
     undo() {
@@ -584,32 +687,11 @@ const SudokuGame = {
     },
 
     /**
-     * Redo the last undone action
-     */
-    redo() {
-        const nextState = SudokuHistory.redo({
-            userEntries: this.state.userEntries,
-            candidates: this.state.candidates
-        });
-
-        if (nextState) {
-            this.state.userEntries = nextState.userEntries;
-            this.state.candidates = nextState.candidates;
-            this.updateConflicts();
-            this.render();
-            SudokuInput.updateCompletedNumbers(this.state);
-        }
-    },
-
-    /**
-     * Update undo/redo button states
+     * Update undo button state
      */
     updateHistoryButtons() {
         const undoBtn = document.getElementById('undo-btn');
-        const redoBtn = document.getElementById('redo-btn');
-
         undoBtn.disabled = !SudokuHistory.canUndo();
-        redoBtn.disabled = !SudokuHistory.canRedo();
     },
 
     /**
@@ -655,6 +737,16 @@ const SudokuGame = {
      * Show the difficulty selection modal
      */
     showDifficultyModal() {
+        // Show/hide Check Progress button based on settings
+        // Only show when instant check is disabled (zen mode or manually turned off)
+        const checkBtn = document.getElementById('check-btn');
+        if (checkBtn) {
+            if (!this.settings.instantCheckEnabled) {
+                checkBtn.style.display = '';
+            } else {
+                checkBtn.style.display = 'none';
+            }
+        }
         this.difficultyModal.classList.add('active');
     },
 
