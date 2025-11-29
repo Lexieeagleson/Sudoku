@@ -16,24 +16,38 @@ const SudokuGenerator = {
     /**
      * Generate a complete valid Sudoku solution.
      * Uses backtracking algorithm and validates the result.
+     * If validation fails, automatically regenerates until a valid grid is produced.
      * 
      * Validation is performed after generation to confirm:
      * - All 9 rows contain unique numbers 1-9
      * - All 9 columns contain unique numbers 1-9
      * - All 9 3x3 subgrids contain unique numbers 1-9
      * 
+     * @param {number} maxAttempts - Maximum regeneration attempts (default: 10)
      * @returns {Array} 9x9 solved Sudoku grid
-     * @throws {Error} If grid generation fails validation (should never happen)
      */
-    generateSolution() {
+    generateSolution(maxAttempts = 10) {
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
+            this.fillGrid(grid);
+            
+            // Validate the generated solution to ensure correctness
+            if (this.isValidGrid(grid)) {
+                return grid;
+            }
+            // If validation fails, try again (should be rare with backtracking)
+        }
+        
+        // Final attempt with validation - backtracking should always produce valid grids
         const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
         this.fillGrid(grid);
         
-        // Validate the generated solution to ensure correctness
+        // Validate final attempt and return (backtracking guarantees validity)
         if (!this.isValidGrid(grid)) {
-            throw new Error('Generated grid failed validation - this should not happen');
+            // This should never happen with a correct backtracking implementation
+            // but we validate anyway for safety
+            return this.generateSolution(maxAttempts);
         }
-        
         return grid;
     },
 
@@ -241,6 +255,7 @@ const SudokuGenerator = {
 
     /**
      * Generate a puzzle by removing numbers from a complete solution.
+     * If validation fails, automatically regenerates until a valid puzzle is produced.
      * 
      * The puzzle generation process ensures valid Sudoku rules:
      * 1. Starts with a fully validated solution (all rows, columns, subgrids valid)
@@ -255,78 +270,83 @@ const SudokuGenerator = {
      * - Super Hard: 17-20 clues (fewest prefilled - expert only)
      * 
      * @param {string} difficulty - Difficulty level ('easy', 'medium', 'hard', 'superhard')
+     * @param {number} maxAttempts - Maximum regeneration attempts (default: 10)
      * @returns {Object} Object with puzzle and solution arrays
-     * @throws {Error} If puzzle generation fails validation
      */
-    generatePuzzle(difficulty) {
-        // Generate and validate a complete solution
-        const solution = this.generateSolution();
-        const puzzle = solution.map(row => [...row]);
-        
-        // Determine how many cells to remove based on difficulty
-        // Easy has more clues (easiest), Super Hard has fewest (hardest)
-        const clueRanges = {
-            easy: { min: 45, max: 50 },
-            medium: { min: 28, max: 32 },
-            hard: { min: 22, max: 26 },
-            superhard: { min: 17, max: 20 }
-        };
+    generatePuzzle(difficulty, maxAttempts = 10) {
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            // Generate and validate a complete solution
+            const solution = this.generateSolution();
+            const puzzle = solution.map(row => [...row]);
+            
+            // Determine how many cells to remove based on difficulty
+            // Easy has more clues (easiest), Super Hard has fewest (hardest)
+            const clueRanges = {
+                easy: { min: 45, max: 50 },
+                medium: { min: 28, max: 32 },
+                hard: { min: 22, max: 26 },
+                superhard: { min: 17, max: 20 }
+            };
 
-        const range = clueRanges[difficulty] || clueRanges.easy;
-        const targetClues = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
-        const cellsToRemove = 81 - targetClues;
+            const range = clueRanges[difficulty] || clueRanges.easy;
+            const targetClues = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+            const cellsToRemove = 81 - targetClues;
 
-        // Group positions by their 3x3 box for balanced distribution
-        const boxes = Array.from({ length: 9 }, () => []);
-        for (let r = 0; r < 9; r++) {
-            for (let c = 0; c < 9; c++) {
-                const boxIndex = Math.floor(r / 3) * 3 + Math.floor(c / 3);
-                boxes[boxIndex].push([r, c]);
-            }
-        }
-
-        // Shuffle positions within each box
-        boxes.forEach(box => this.shuffleArray(box));
-
-        // Create a balanced removal order by interleaving cells from each box
-        const positions = [];
-        const maxBoxSize = 9;
-        // Pre-shuffle box order once for randomness
-        const boxOrder = this.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-        for (let i = 0; i < maxBoxSize; i++) {
-            for (const boxIndex of boxOrder) {
-                if (i < boxes[boxIndex].length) {
-                    positions.push(boxes[boxIndex][i]);
+            // Group positions by their 3x3 box for balanced distribution
+            const boxes = Array.from({ length: 9 }, () => []);
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const boxIndex = Math.floor(r / 3) * 3 + Math.floor(c / 3);
+                    boxes[boxIndex].push([r, c]);
                 }
             }
-        }
 
-        // Remove cells while ensuring unique solution
-        let removed = 0;
-        for (const [row, col] of positions) {
-            if (removed >= cellsToRemove) break;
-            
-            const backup = puzzle[row][col];
-            puzzle[row][col] = 0;
+            // Shuffle positions within each box
+            boxes.forEach(box => this.shuffleArray(box));
 
-            // For easier difficulties, just remove without checking uniqueness
-            // For harder, verify unique solution
-            if (difficulty === 'hard' || difficulty === 'superhard') {
-                if (!this.hasUniqueSolution(puzzle)) {
-                    puzzle[row][col] = backup;
-                    continue;
+            // Create a balanced removal order by interleaving cells from each box
+            const positions = [];
+            const maxBoxSize = 9;
+            // Pre-shuffle box order once for randomness
+            const boxOrder = this.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+            for (let i = 0; i < maxBoxSize; i++) {
+                for (const boxIndex of boxOrder) {
+                    if (i < boxes[boxIndex].length) {
+                        positions.push(boxes[boxIndex][i]);
+                    }
                 }
             }
+
+            // Remove cells while ensuring unique solution
+            let removed = 0;
+            for (const [row, col] of positions) {
+                if (removed >= cellsToRemove) break;
+                
+                const backup = puzzle[row][col];
+                puzzle[row][col] = 0;
+
+                // For easier difficulties, just remove without checking uniqueness
+                // For harder, verify unique solution
+                if (difficulty === 'hard' || difficulty === 'superhard') {
+                    if (!this.hasUniqueSolution(puzzle)) {
+                        puzzle[row][col] = backup;
+                        continue;
+                    }
+                }
+                
+                removed++;
+            }
+
+            // Validate the final puzzle (allowing empty cells)
+            if (this.isValidGrid(puzzle, false)) {
+                return { puzzle, solution };
+            }
             
-            removed++;
+            // If validation fails, try again (should be rare)
         }
 
-        // Validate the final puzzle (allowing empty cells)
-        if (!this.isValidGrid(puzzle, false)) {
-            throw new Error('Generated puzzle failed validation - this should not happen');
-        }
-
-        return { puzzle, solution };
+        // Final attempt - recursively call to ensure we get a valid puzzle
+        return this.generatePuzzle(difficulty, maxAttempts);
     },
 
     /**
