@@ -116,6 +116,9 @@ const SudokuGame = {
         document.getElementById('new-game-btn').addEventListener('click', () => {
             this.showDifficultyModal();
         });
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            this.resetGame();
+        });
         document.getElementById('solve-btn').addEventListener('click', () => {
             this.solvePuzzle();
             this.hideDifficultyModal();
@@ -243,15 +246,38 @@ const SudokuGame = {
             puzzleData = SudokuGenerator.generatePuzzle(difficulty);
         }
 
-        // Initialize game state
+        // Initialize puzzle-specific game state
         this.state.puzzle = puzzleData.puzzle.map(row => [...row]);
         this.state.solution = puzzleData.solution.map(row => [...row]);
+        this.state.official = puzzleData.puzzle.map(row => 
+            row.map(cell => cell !== 0)
+        );
+
+        // Reset the playable state
+        this._resetPlayableState();
+    },
+
+    /**
+     * Reset the current game
+     * Clears user entries, candidates, timer, and lives while keeping the same puzzle
+     */
+    resetGame() {
+        // Only reset if we have a puzzle loaded
+        if (this.state.puzzle.length === 0) return;
+
+        this._resetPlayableState();
+    },
+
+    /**
+     * Reset the playable state (user entries, candidates, timer, lives, etc.)
+     * Used by both startNewGame and resetGame
+     * @private
+     */
+    _resetPlayableState() {
+        // Reset user entries and candidates
         this.state.userEntries = Array.from({ length: 9 }, () => Array(9).fill(0));
         this.state.candidates = Array.from({ length: 9 }, () => 
             Array.from({ length: 9 }, () => new Set())
-        );
-        this.state.official = puzzleData.puzzle.map(row => 
-            row.map(cell => cell !== 0)
         );
         this.state.conflicts = Array.from({ length: 9 }, () => Array(9).fill(false));
         this.state.isComplete = false;
