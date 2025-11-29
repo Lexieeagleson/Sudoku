@@ -10,7 +10,7 @@ A fully functional, interactive web-based Sudoku game with clean UI, large reada
 - **Standard 9×9 Grid**: Bold borders around each 3×3 subgrid with large, legible fonts
 - **Visual Distinctions**: Clear visual difference between official puzzle numbers, user-entered numbers, and candidate (pencil) numbers
 - **Four Difficulty Levels**:
-  - Easy (45+ clues)
+  - Easy (45-50 clues)
   - Medium (35-44 clues)
   - Hard (27-34 clues)
   - Super Hard (17-26 clues)
