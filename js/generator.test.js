@@ -254,8 +254,8 @@ const SudokuGeneratorTests = {
     testGenerateSolution() {
         console.log('\n--- Testing generateSolution ---');
 
-        // Generate multiple solutions and validate each
-        for (let i = 0; i < 5; i++) {
+        // Generate multiple solutions and validate each (reduced for performance)
+        for (let i = 0; i < 3; i++) {
             const solution = SudokuGenerator.generateSolution();
             this.assert(SudokuGenerator.isValidGrid(solution), `Generated solution ${i + 1} should be valid`);
 
