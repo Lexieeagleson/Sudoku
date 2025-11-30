@@ -5,11 +5,11 @@
  * 
  * Each puzzle has been verified to have exactly one solution
  * 
- * Clue ranges (prefilled numbers) - Easy has more, Super Hard has fewer:
+ * Clue ranges (prefilled numbers) - Easy has more, Extreme has fewer:
  * - Easy: 45-50 clues (most prefilled - perfect for beginners)
- * - Medium: 28-32 clues (moderate challenge)
- * - Hard: 22-26 clues (fewer prefilled - requires advanced techniques)
- * - Super Hard: 17-20 clues (fewest prefilled - expert only)
+ * - Medium: 36-45 clues (moderate challenge)
+ * - Hard: 28-36 clues (fewer prefilled - requires advanced techniques)
+ * - Extreme: 17-28 clues (fewest prefilled - expert only)
  */
 
 const SudokuPuzzles = {
@@ -93,7 +93,7 @@ const SudokuPuzzles = {
     ],
 
     /**
-     * Medium puzzles - 28-32 clues for moderate challenge
+     * Medium puzzles - 36-45 clues for moderate challenge
      * Clues are spread throughout the grid for balanced gameplay
      */
     medium: [
@@ -172,7 +172,7 @@ const SudokuPuzzles = {
     ],
 
     /**
-     * Hard puzzles - 22-26 clues requiring advanced techniques
+     * Hard puzzles - 28-36 clues requiring advanced techniques
      * Clues are spread throughout the grid for balanced gameplay
      */
     hard: [
@@ -227,11 +227,11 @@ const SudokuPuzzles = {
     ],
 
     /**
-     * Super Hard puzzles - 17-20 clues for experts
+     * Extreme puzzles - 17-28 clues for experts
      * These require advanced solving techniques
      * Clues are spread throughout the grid for balanced gameplay
      */
-    superhard: [
+    extreme: [
         {
             puzzle: [
                 [0,0,5,3,0,0,0,0,0],
@@ -308,7 +308,7 @@ const SudokuPuzzles = {
 
     /**
      * Get a random puzzle for the specified difficulty
-     * @param {string} difficulty - 'easy', 'medium', 'hard', or 'superhard'
+     * @param {string} difficulty - 'easy', 'medium', 'hard', or 'extreme'
      * @returns {Object} Puzzle object with puzzle and solution arrays
      */
     getRandomPuzzle(difficulty) {
