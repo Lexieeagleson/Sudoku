@@ -265,11 +265,11 @@ const SudokuGenerator = {
      * 
      * Clue ranges by difficulty:
      * - Easy: 45-50 clues (most prefilled - perfect for beginners)
-     * - Medium: 28-32 clues (moderate challenge)
-     * - Hard: 22-26 clues (fewer prefilled - requires advanced techniques)
-     * - Super Hard: 17-20 clues (fewest prefilled - expert only)
+     * - Medium: 36-45 clues (moderate challenge)
+     * - Hard: 28-36 clues (fewer prefilled - requires advanced techniques)
+     * - Extreme: 17-28 clues (fewest prefilled - expert only)
      * 
-     * @param {string} difficulty - Difficulty level ('easy', 'medium', 'hard', 'superhard')
+     * @param {string} difficulty - Difficulty level ('easy', 'medium', 'hard', 'extreme')
      * @param {number} maxAttempts - Maximum regeneration attempts (default: 10)
      * @returns {Object} Object with puzzle and solution arrays
      */
@@ -280,12 +280,12 @@ const SudokuGenerator = {
             const puzzle = solution.map(row => [...row]);
             
             // Determine how many cells to remove based on difficulty
-            // Easy has more clues (easiest), Super Hard has fewest (hardest)
+            // Easy has more clues (easiest), Extreme has fewest (hardest)
             const clueRanges = {
                 easy: { min: 45, max: 50 },
-                medium: { min: 28, max: 32 },
-                hard: { min: 22, max: 26 },
-                superhard: { min: 17, max: 20 }
+                medium: { min: 36, max: 45 },
+                hard: { min: 28, max: 36 },
+                extreme: { min: 17, max: 28 }
             };
 
             const range = clueRanges[difficulty] || clueRanges.easy;
@@ -327,7 +327,7 @@ const SudokuGenerator = {
 
                 // For easier difficulties, just remove without checking uniqueness
                 // For harder, verify unique solution
-                if (difficulty === 'hard' || difficulty === 'superhard') {
+                if (difficulty === 'hard' || difficulty === 'extreme') {
                     if (!this.hasUniqueSolution(puzzle)) {
                         puzzle[row][col] = backup;
                         continue;

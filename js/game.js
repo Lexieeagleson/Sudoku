@@ -397,7 +397,7 @@ const SudokuGame = {
             easy: 'Easy',
             medium: 'Medium',
             hard: 'Hard',
-            superhard: 'Super Hard'
+            extreme: 'Extreme'
         };
         return names[difficulty] || 'Easy';
     },

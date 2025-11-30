@@ -274,12 +274,12 @@ const SudokuGeneratorTests = {
     testGeneratePuzzleAllDifficulties() {
         console.log('\n--- Testing generatePuzzle for all difficulties ---');
 
-        const difficulties = ['easy', 'medium', 'hard', 'superhard'];
+        const difficulties = ['easy', 'medium', 'hard', 'extreme'];
         const clueRanges = {
             easy: { min: 45, max: 50 },
-            medium: { min: 28, max: 32 },
-            hard: { min: 22, max: 26 },
-            superhard: { min: 17, max: 20 }
+            medium: { min: 36, max: 45 },
+            hard: { min: 28, max: 36 },
+            extreme: { min: 17, max: 28 }
         };
 
         for (const difficulty of difficulties) {
@@ -338,7 +338,7 @@ const SudokuGeneratorTests = {
             return;
         }
 
-        const difficulties = ['easy', 'medium', 'hard', 'superhard'];
+        const difficulties = ['easy', 'medium', 'hard', 'extreme'];
 
         for (const difficulty of difficulties) {
             const puzzles = SudokuPuzzles[difficulty];
