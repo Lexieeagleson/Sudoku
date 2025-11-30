@@ -276,15 +276,8 @@ const SudokuGame = {
         this.state.difficulty = difficulty;
         this.difficultyDisplay.textContent = this.formatDifficulty(difficulty);
 
-        // Get a puzzle for the difficulty
-        let puzzleData;
-        
-        // Try to get a pre-defined puzzle first, generate if not available
-        if (SudokuPuzzles[difficulty] && SudokuPuzzles[difficulty].length > 0) {
-            puzzleData = SudokuPuzzles.getRandomPuzzle(difficulty);
-        } else {
-            puzzleData = SudokuGenerator.generatePuzzle(difficulty);
-        }
+        // Dynamically generate a puzzle for variety
+        const puzzleData = SudokuGenerator.generatePuzzle(difficulty);
 
         // Initialize puzzle-specific game state
         this.state.puzzle = puzzleData.puzzle.map(row => [...row]);
