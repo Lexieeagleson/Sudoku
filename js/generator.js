@@ -293,14 +293,14 @@ const SudokuGenerator = {
             const cellsToRemove = 81 - targetClues;
 
             // Create all positions and shuffle them for random removal order
-            const positions = [];
+            let positions = [];
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
                     positions.push([r, c]);
                 }
             }
             // Shuffle all positions to ensure truly random clue distribution
-            this.shuffleArray(positions);
+            positions = this.shuffleArray(positions);
 
             // Remove cells while ensuring unique solution
             let removed = 0;
