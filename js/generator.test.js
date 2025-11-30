@@ -53,6 +53,7 @@ const SudokuGeneratorTests = {
         this.testIsValidGrid();
         this.testGenerateSolution();
         this.testGeneratePuzzleAllDifficulties();
+        this.testClueDistributionRandomness();
         this.testPreDefinedPuzzles();
 
         // Print summary
@@ -322,6 +323,87 @@ const SudokuGeneratorTests = {
             }
             this.assert(cluesMatchSolution, `${difficulty}: Puzzle clues should match solution values`);
         }
+    },
+
+    /**
+     * Test that clue distribution is randomized (not in predictable patterns)
+     */
+    testClueDistributionRandomness() {
+        console.log('\n--- Testing clue distribution randomness ---');
+
+        // Generate multiple puzzles and check that clue positions vary
+        const puzzleCount = 5;
+        const cluePositions = [];
+
+        for (let i = 0; i < puzzleCount; i++) {
+            const { puzzle } = SudokuGenerator.generatePuzzle('easy');
+            const positions = [];
+            for (let row = 0; row < 9; row++) {
+                for (let col = 0; col < 9; col++) {
+                    if (puzzle[row][col] !== 0) {
+                        positions.push(`${row},${col}`);
+                    }
+                }
+            }
+            cluePositions.push(new Set(positions));
+        }
+
+        // Check that not all puzzles have identical clue positions
+        let allIdentical = true;
+        const firstPositions = cluePositions[0];
+        for (let i = 1; i < cluePositions.length; i++) {
+            const currentPositions = cluePositions[i];
+            if (firstPositions.size !== currentPositions.size) {
+                allIdentical = false;
+                break;
+            }
+            for (const pos of firstPositions) {
+                if (!currentPositions.has(pos)) {
+                    allIdentical = false;
+                    break;
+                }
+            }
+            if (!allIdentical) break;
+        }
+
+        this.assert(!allIdentical, 'Multiple generated puzzles should have different clue positions');
+
+        // Check that clues are not all in first rows/columns (linear pattern)
+        const { puzzle } = SudokuGenerator.generatePuzzle('easy');
+        let firstRowClues = 0;
+        let firstColClues = 0;
+        let totalClues = 0;
+
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (puzzle[row][col] !== 0) {
+                    totalClues++;
+                    if (row === 0) firstRowClues++;
+                    if (col === 0) firstColClues++;
+                }
+            }
+        }
+
+        // First row/column should not contain all clues (would indicate linear pattern)
+        this.assert(
+            firstRowClues < totalClues && firstColClues < totalClues,
+            'Clues should not be concentrated in first row or column'
+        );
+
+        // Test distribution across all 3x3 boxes
+        const boxClues = Array(9).fill(0);
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (puzzle[row][col] !== 0) {
+                    const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
+                    boxClues[boxIndex]++;
+                }
+            }
+        }
+
+        // Each box should have at least one clue (for easy difficulty)
+        const allBoxesHaveClues = boxClues.every(count => count > 0);
+        this.assert(allBoxesHaveClues, 'Easy puzzle should have clues in all 9 boxes');
     },
 
     /**

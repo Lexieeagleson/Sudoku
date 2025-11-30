@@ -292,30 +292,15 @@ const SudokuGenerator = {
             const targetClues = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
             const cellsToRemove = 81 - targetClues;
 
-            // Group positions by their 3x3 box for balanced distribution
-            const boxes = Array.from({ length: 9 }, () => []);
+            // Create all positions and shuffle them for random removal order
+            const positions = [];
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
-                    const boxIndex = Math.floor(r / 3) * 3 + Math.floor(c / 3);
-                    boxes[boxIndex].push([r, c]);
+                    positions.push([r, c]);
                 }
             }
-
-            // Shuffle positions within each box
-            boxes.forEach(box => this.shuffleArray(box));
-
-            // Create a balanced removal order by interleaving cells from each box
-            const positions = [];
-            const maxBoxSize = 9;
-            // Pre-shuffle box order once for randomness
-            const boxOrder = this.shuffleArray([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-            for (let i = 0; i < maxBoxSize; i++) {
-                for (const boxIndex of boxOrder) {
-                    if (i < boxes[boxIndex].length) {
-                        positions.push(boxes[boxIndex][i]);
-                    }
-                }
-            }
+            // Shuffle all positions to ensure truly random clue distribution
+            this.shuffleArray(positions);
 
             // Remove cells while ensuring unique solution
             let removed = 0;
