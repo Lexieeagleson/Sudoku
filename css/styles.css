@@ -16,7 +16,7 @@
     /* Color-blind friendly palette */
     --highlight-cell: rgba(59, 130, 246, 0.15);
     --highlight-region: rgba(59, 130, 246, 0.08);
-    --highlight-number: rgba(251, 191, 36, 0.35);
+    --highlight-number: rgba(16, 185, 129, 0.35);
     --highlight-selected: rgba(59, 130, 246, 0.3);
     --conflict-color: rgba(239, 68, 68, 0.3);
     
@@ -55,7 +55,7 @@
     
     --highlight-cell: rgba(96, 165, 250, 0.2);
     --highlight-region: rgba(96, 165, 250, 0.1);
-    --highlight-number: rgba(251, 191, 36, 0.25);
+    --highlight-number: rgba(16, 185, 129, 0.25);
     --highlight-selected: rgba(96, 165, 250, 0.35);
     
     --cell-official: #93c5fd;
@@ -867,16 +867,16 @@ body {
 
 /* Hint highlight cell state */
 .cell.hint-highlight {
-    background-color: rgba(251, 191, 36, 0.5) !important;
+    background-color: rgba(16, 185, 129, 0.5) !important;
     animation: hintPulse 1.5s ease-in-out infinite;
 }
 
 @keyframes hintPulse {
     0%, 100% {
-        background-color: rgba(251, 191, 36, 0.3);
+        background-color: rgba(16, 185, 129, 0.3);
     }
     50% {
-        background-color: rgba(251, 191, 36, 0.6);
+        background-color: rgba(16, 185, 129, 0.6);
     }
 }
 
