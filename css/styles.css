@@ -155,10 +155,25 @@ body {
     box-shadow: var(--shadow);
 }
 
-.difficulty-display, .timer-display, .lives-display {
+.difficulty-display, .lives-display {
     display: flex;
-    gap: 8px;
+    flex-direction: column;
     align-items: center;
+    gap: 4px;
+}
+
+.timer-display {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.timer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
 .label {
@@ -872,12 +887,12 @@ body {
     cursor: pointer;
     font-size: 1rem;
     padding: 4px;
-    margin-left: 8px;
     border-radius: 4px;
     transition: var(--transition);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    align-self: center;
 }
 
 .pause-btn:hover {
