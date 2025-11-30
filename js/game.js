@@ -12,7 +12,8 @@ const SudokuGame = {
         timerEnabled: true,
         livesEnabled: true,
         instantCheckEnabled: true,
-        zenMode: false
+        zenMode: false,
+        colorScheme: 'regular'
     },
 
     /**
@@ -44,6 +45,7 @@ const SudokuGame = {
         this.initComponents();
         this.setupEventListeners();
         this.loadTheme();
+        this.loadColorScheme();
         this.applySettings();
         
         // Show difficulty modal on first load
@@ -214,6 +216,10 @@ const SudokuGame = {
         // Settings toggles
         document.getElementById('zen-mode-toggle').addEventListener('change', (e) => {
             this.setZenMode(e.target.checked);
+        });
+
+        document.getElementById('color-scheme-select').addEventListener('change', (e) => {
+            this.setColorScheme(e.target.value);
         });
 
         document.getElementById('timer-toggle').addEventListener('change', (e) => {
@@ -926,6 +932,37 @@ const SudokuGame = {
     },
 
     /**
+     * Load saved color scheme from localStorage
+     */
+    loadColorScheme() {
+        const savedScheme = this.settings.colorScheme || 'regular';
+        this.applyColorScheme(savedScheme);
+    },
+
+    /**
+     * Set the color scheme
+     * @param {string} scheme - Color scheme name ('regular', 'colorblind', 'fun')
+     */
+    setColorScheme(scheme) {
+        this.settings.colorScheme = scheme;
+        this.applyColorScheme(scheme);
+        this.saveSettings();
+    },
+
+    /**
+     * Apply a color scheme to the document
+     * @param {string} scheme - Color scheme name
+     */
+    applyColorScheme(scheme) {
+        const html = document.documentElement;
+        if (scheme === 'regular') {
+            html.removeAttribute('data-color-scheme');
+        } else {
+            html.setAttribute('data-color-scheme', scheme);
+        }
+    },
+
+    /**
      * Show the settings modal
      */
     showSettingsModal() {
@@ -971,6 +1008,7 @@ const SudokuGame = {
         document.getElementById('timer-toggle').checked = this.settings.timerEnabled;
         document.getElementById('lives-toggle').checked = this.settings.livesEnabled;
         document.getElementById('instant-check-toggle').checked = this.settings.instantCheckEnabled;
+        document.getElementById('color-scheme-select').value = this.settings.colorScheme || 'regular';
 
         // Disable individual toggles when zen mode is on
         const disabled = this.settings.zenMode;
